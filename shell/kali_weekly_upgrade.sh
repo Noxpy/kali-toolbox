@@ -21,6 +21,8 @@
     - Safe kernel removal after reboot
     - Automation-ready for cron jobs
 
+DOC
+
 # ==============================
 # Kali Weekly Upgrade Script
 # ==============================
