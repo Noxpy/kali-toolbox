@@ -1,31 +1,23 @@
 #!/bin/bash
-
-: <<'DOC'
+: <<'END_DOC'
 .SYNOPSIS
-    Kali Weekly Upgrade Script (Non-Interactive)
+    Automatically updates and upgrades all packages on Kali Linux, 
+    identifies old kernels, and schedules a reboot if a new kernel is installed.
 
 .DESCRIPTION
-    Automatically updates and upgrades all packages on Kali Linux,
-    identifies old kernels, and schedules a reboot if a new kernel was installed.
-    Produces structured logs in /var/log/kali_upgrade/weekly.
+    Runs apt update and apt upgrade non-interactively.
+    Detects installed kernels and schedules a reboot if a new kernel will be active.
+    Logs all output to a timestamped log in /var/log/kali_upgrade/weekly.
 
 .AUTHOR
     Anthony Marturano
 
-.MODIFIED
-    2026-01-14
-
 .NOTES
-    - Fully non-interactive
-    - Logging enabled
-    - Safe kernel removal after reboot
-    - Automation-ready for cron jobs
-
-DOC
-
-# ==============================
-# Kali Weekly Upgrade Script
-# ==============================
+    - Non-interactive
+    - Root privileges recommended
+    - Automation-safe
+END_DOC
+# DOC
 
 # Log directories
 LOG_DIR="/var/log/kali_upgrade/weekly"
@@ -34,22 +26,22 @@ mkdir -p "$LOG_DIR"
 # Log file path
 LOGFILE="$LOG_DIR/kali_upgrade_$(date +%F_%H-%M).log"
 
-# Send output to terminal and log file
+# Send all output to terminal and log file
 exec > >(tee -a "$LOGFILE") 2>&1
 
 echo "==============================="
 echo "Kali Weekly Upgrade Script Started: $(date)"
 echo "==============================="
 
-# Step 1: Update package list
+# Update package list
 echo -e "\nUpdating package lists..."
 apt update -y
 
-# Step 2: Upgrade all packages automatically
+# Upgrade all packages
 echo -e "\nUpgrading all packages..."
 apt upgrade -y
 
-# Step 3: Identify old kernels
+# Identify old kernels
 CURRENT_KERNEL=$(uname -r)
 echo -e "\nCurrent running kernel: $CURRENT_KERNEL"
 
@@ -68,7 +60,7 @@ else
     printf '  %s\n' "${OLD_KERNELS[@]}"
 fi
 
-# Step 4: Schedule reboot if a new kernel was installed
+# Schedule reboot if a new kernel was installed
 if [[ ${#OLD_KERNELS[@]} -gt 0 ]]; then
     echo -e "\nNew kernel detected. Scheduling reboot in 1 minute..."
     /sbin/shutdown -r +1 "Rebooting automatically to apply new kernel."
